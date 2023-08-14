@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Infinite Mansion</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<style>
+body {
+  background-color: black;
+  font-family: sans-serif;
+}
+
+.room {
+  width: 300px;
+  height: 300px;
+  border: 1px solid black;
+  margin: 10px;
+}
+
+.item {
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.popup {
+  background-color: white;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.popup p {
+  margin: 10px;
+}
+</style>
+</head>
+<body>
+
+<script>
+var rooms = [];
+var items = [];
+var currentRoom = 0;
+var person = {
+  x: 0,
+  y: 0
+};
+
+function createRoom() {
+  var width = Math.floor(Math.random() * 300) + 100;
+  var height = Math.floor(Math.random() * 300) + 100;
+  var room = document.createElement("div");
+  room.className = "room";
+  room.style.width = width + "px";
+  room.style.height = height + "px";
+  document.body.appendChild(room);
+
+  var doors = [];
+  for (var i = 0; i < Math.floor(Math.random() * 4) + 1; i++) {
+    var door = document.createElement("div");
+    door.className = "door";
+    door.style.left = Math.floor(Math.random() * width) + "px";
+    door.style.top = Math.floor(Math.random() * height) + "px";
+    room.appendChild(door);
+
+    doors.push(door);
+  }
+
+  for (var i = 0; i < doors.length; i++) {
+    $(doors[i]).click(function() {
+      currentRoom = (currentRoom + 1) % rooms.length;
+      person.x = 0;
+      person.y = 0;
+      updatePerson();
+    });
+  }
+
+  var numItems = Math.floor(Math.random() * 10) + 1;
+  for (var i = 0; i < numItems; i++) {
+    var item = document.createElement("div");
+    item.className = "item";
+    item.style.left = Math.floor(Math.random() * width) + "px";
+    item.style.top = Math.floor(Math.random() * height) + "px";
+    room.appendChild(item);
+
+    items.push(item);
+
+    $(item).mouseover(function() {
+      var itemText = "This is an item";
+      if (i % 2 == 0) {
+        itemText = "This is a cool item";
+      } else if (i % 3 == 0) {
+        itemText = "This is a dangerous item";
+      }
+
+      var popup = document.createElement("div");
+      popup.className = "popup";
+      popup.innerHTML = "<p>" + itemText + "</p>";
+      document.body.appendChild(popup);
+
+      $(popup).css("top", item.offsetTop + "px");
+      $(popup).css("left", item.offsetLeft + "px");
+      $(popup).show();
+    });
+
+    $(item).mouseout(function() {
+      $(this).find(".popup").hide();
+    });
+  }
+
+  rooms.push(room);
+}
+
+function updatePerson() {
